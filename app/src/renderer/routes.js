@@ -1,11 +1,11 @@
+const route = (name, path, component) => ({
+  path,
+  name,
+  component,
+});
+
 export default [
-  {
-    path: '/',
-    name: 'landing-page',
-    component: require('components/LandingPageView'),
-  },
-  {
-    path: '*',
-    redirect: '/',
-  },
+  // route('landing-page', '/', require('components/LandingPageView')),
+  route('tasks', '/', require('pages/Tasks')),
+  { path: '*', redirect: { name: 'tasks' } },
 ];
