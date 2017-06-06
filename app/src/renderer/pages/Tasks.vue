@@ -1,5 +1,6 @@
 <template lang="pug">
   div
+    button(@click="sync(true)") Sync
     div {{ loaderStack }}
     div projects: {{ projects.length }}
     div tasks: {{ tasks.length }}
@@ -35,14 +36,20 @@
       // },
     },
     watch: {
-      projects(projects) {
-        console.log('projects => ', projects);
+      // projects(projects) {
+      //   console.log('projects => ', projects);
+      // },
+    },
+
+    methods: {
+      sync(force = false) {
+        this.$store.dispatch('syncProjects', force);
+        this.$store.dispatch('syncTasks', force);
       },
     },
+
     mounted() {
-      console.log('this.projects => ', this.projects.length);
-      this.$store.dispatch('loadProjects');
-      this.$store.dispatch('loadTasks');
+      this.sync();
     },
   };
 </script>

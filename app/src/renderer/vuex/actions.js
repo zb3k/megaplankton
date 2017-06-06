@@ -1,23 +1,28 @@
 import * as types from './mutation-types';
 import api from './api';
 
-const loaded = {};
-function once(key) {
-  return loaded[key] ? false : (loaded[key] = true);
+// const loaded = {};
+// function once(key) {
+//   return loaded[key] ? false : (loaded[key] = true);
+// }
+function resetLocalData(key) {
+  window.localStorage.setItem(key, '');
 }
-
-function localData(key, fetch, commit, success) {
-  commit(types.ADD_LOADER_ITEM, 'projects');
-
-  const data = window.localStorage.getItem(key);
+function localData(key, api, commit, success, append = false) {
+  commit(types.ADD_LOADER_ITEM, key);
+  let data = window.localStorage.getItem(key);
   if (data) {
-    success(JSON.parse(data));
-    commit(types.REMOVE_LOADER_ITEM, 'projects');
+    data = JSON.parse(data);
+  }
+  if (data && !append) {
+    success(data);
+    commit(types.REMOVE_LOADER_ITEM, key);
   } else {
-    fetch().then(data => {
-      window.localStorage.setItem(key, JSON.stringify(data));
-      success(data);
-      commit(types.REMOVE_LOADER_ITEM, 'projects');
+    api().then(newData => {
+      newData = [...data, ...newData];
+      window.localStorage.setItem(key, JSON.stringify(newData));
+      success(newData);
+      commit(types.REMOVE_LOADER_ITEM, key);
     });
   }
 }
@@ -31,18 +36,33 @@ export const incrementMain = ({ commit }) => {
   commit(types.INCREMENT_MAIN_COUNTER);
 };
 
-export const loadProjects = ({ commit }) => {
-  if (once('loadProjects')) {
-    localData('projects', () => api.projects(), commit, data => {
-      commit(types.SET_PROJECTS, data);
-    });
+export const syncProjects = ({ commit }, force = false) => {
+  // if (once('syncProjects')) {
+  if (force) {
+    resetLocalData('projects');
+    commit(types.SET_PROJECTS, []);
   }
+  localData('projects', () => api.projects(), commit, data => {
+    commit(types.SET_PROJECTS, data);
+  });
+  // }
 };
 
-export const loadTasks = ({ commit }) => {
-  if (once('loadTasks')) {
-    localData('tasks', () => api.tasks({ limit: 100, offset: 0 }), commit, data => {
-      commit(types.ADD_TASKS, data);
-    });
+export const syncTasks = ({ commit, dispatch }, force = false, params = { offset: 0 }) => {
+  if (!params.offset) {
+    params.offset = 0;
   }
+  if (force) {
+    resetLocalData('tasks');
+    commit(types.RESET_TASKS);
+  }
+
+  params.limit = api.RECORDS_LIMIT;
+  localData('tasks', () => api.tasks(params), commit, data => {
+    commit(types.SET_TASKS, data);
+
+    if (data.length === api.RECORDS_LIMIT && params.offset < 100) {
+      dispatch('syncTasks', false, { ...params, offset: params.offset + api.RECORDS_LIMIT });
+    }
+  }, true);
 };
