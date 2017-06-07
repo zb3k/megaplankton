@@ -1,8 +1,12 @@
 <template lang="pug">
-  div.project-row
-    div.project-info: slot(name="info")
-    div.project-name {{ project.name }}
-    div.parent-project-name(v-if="project.super_project") {{ project.super_project.name }}
+  div.project-row-box(:class="{active:showContent}")
+    div.project-row(@click="showContent=!showContent")
+      div.project-info: slot(name="info")
+      div.project-name
+        span.project-icon: i.fa(:class="showContent ? 'fa-folder-open' : 'fa-folder'")
+        |  {{ project.name }}
+      //- div.parent-project-name(v-if="project.super_project") {{ project.super_project.name }}
+    slot(v-if="showContent")
 </template>
 
 <script>
@@ -10,22 +14,42 @@
     props: {
       project: Object,
     },
+
+    data: () => ({
+      showContent: false,
+    }),
   };
 </script>
 
 <style lang="stylus">
   .project-row
+    background    #f9f9f9
     border-bottom 1px solid #EEE
     transition    all .15s ease
     cursor        pointer
-    padding       10px
+    // display       table
+    width         100%
+    color         #555
+    // background linear-gradient(0deg, #f9f9f9, #FFF)
+
+    // .active > &
+    //   box-shadow 0 1px 5px #0001
+
+    > div
+      padding    10px 20px
+      // display    table-cell
+      // text-align left
 
     &:hover
       background-color #EEF5F4
 
+    .project-icon
+      display inline-block
+      width 18px
     .project-name
+      // width 50%
       // font-weight 600
-      font-size 1.1rem
+      font-size 1rem
 
     .parent-project-name
       color       #999
@@ -33,6 +57,8 @@
       // display     inline-block
       // margin-left 5px
     .project-info
+      // width 100px
+      text-align right
       float right
 
 </style>

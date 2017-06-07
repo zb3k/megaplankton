@@ -15,6 +15,7 @@
 
 <style lang="stylus">
   @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600&subset=cyrillic,cyrillic-ext')
+  @import url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css')
 
   *
     margin  0
