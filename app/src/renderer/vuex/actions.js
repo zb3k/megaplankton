@@ -13,9 +13,14 @@ const storage = {
   set(key, data) {
     window.localStorage.setItem(key, JSON.stringify(data));
   },
+
+  remove(key) {
+    window.localStorage.removeItem(key);
+  },
 };
 
-export const syncProjects = ({ commit }) => {
+export const syncProjects = ({ commit }, force = false) => {
+  if (force) storage.remove('projects');
   const data = storage.get('projects');
   if (data) {
     commit(types.SET_PROJECTS, data);
@@ -28,9 +33,12 @@ export const syncProjects = ({ commit }) => {
 };
 
 export const syncTasks = ({ commit, dispatch, state }, params = { offset: 0 }) => {
-  const data = storage.get('tasks');
-  if (data) {
-    commit(types.SET_TASKS, data);
+  if (params.force && !params.offset) {
+    storage.remove('tasks');
+  }
+  const tasks = storage.get('tasks') || [];
+  if (tasks && tasks.length && !params.force) {
+    commit(types.SET_TASKS, tasks);
   } else {
     if (!params.offset) {
       params.offset = 0;
@@ -39,13 +47,12 @@ export const syncTasks = ({ commit, dispatch, state }, params = { offset: 0 }) =
     params.limit = api.RECORDS_LIMIT;
 
     api.tasks(params).then(data => {
+      storage.set('tasks', [...tasks, ...data]);
       commit(types.ADD_TASKS, data);
 
       if (data.length === api.RECORDS_LIMIT) {
         params.offset += api.RECORDS_LIMIT;
         dispatch('syncTasks', params);
-      } else {
-        storage.set('tasks', state.tasks.all);
       }
     });
   }

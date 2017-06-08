@@ -3,7 +3,8 @@
     div.task-row()
       div.task-info
         slot(name="info")
-        small {{task.comments_unread}}
+        badge(type="danger" v-if="childUnread") {{ childUnread }}
+        badge(type="warning" v-if="task.comments_unread") {{ task.comments_unread }}
       div.task-name(:style="`margin-left:${level*18+5}px`")
         span.task-icon(@click.stop="showContent=!showContent")
           i.fa(:class="showContent ? 'fa-minus-square' : 'fa-plus-square'" v-if="task.childrens && task.childrens.length")
@@ -15,8 +16,24 @@
 </template>
 
 <script>
+  import Badge from 'components/Badge';
+
+  function countDeep(tasks) {
+    let count = 0;
+    if (tasks) {
+      tasks.forEach(task => {
+        count += task.comments_unread + countDeep(task.childrens);
+      });
+    }
+    return count;
+  }
+
   export default {
     name: 'task-row',
+
+    components: {
+      Badge,
+    },
 
     props: {
       task: Object,
@@ -29,6 +46,13 @@
     data: () => ({
       showContent: false,
     }),
+
+    computed: {
+      childUnread() {
+        return countDeep(this.task.childrens);
+      },
+    },
+
   };
 </script>
 

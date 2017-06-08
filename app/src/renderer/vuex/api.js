@@ -24,7 +24,7 @@ function callApiFromStack(decriment = false) {
   if (stack.length && inProgress < MAX_STACK_SIZE) {
     inProgress++;
     const { method, params, mutator, resolve, reject } = stack.shift();
-    console.log('API => ', method, params);
+    // console.log('API => ', method, JSON.stringify(params));
     client[method](...params).send(
       (result) => {
         callApiFromStack(true);
@@ -41,7 +41,7 @@ function callApiFromStack(decriment = false) {
 }
 
 function callApi(method, params, mutator) {
-  console.log('stack.length => ', stack.length);
+  // console.log('stack.length => ', stack.length);
 
   const stackItem = { method, params, mutator };
 

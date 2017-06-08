@@ -2,12 +2,15 @@
   div
 
     header
-      button(@click="sync") Sync
-      |  {{ loaderStack }} | projects: {{ projects.length }} | tasks: {{ tasks.length }}
+      button(@click="sync(true)") Sync
+      .pull-right
+        badge projects: {{ projects.length }}
+        badge tasks: {{ tasks.length }}
 
     aside
       project-row(v-for="project in filteredProjects" :project="project" :key="project.id" v-if="project.childrens.length")
-        template(slot="info"): small {{ project.childrens.length }}
+        template(slot="info"): badge(type="danger" v-if="project.unread") {{ project.unread }}
+        //- / {{ project.childrens.length }}
         task-row(v-for="task in project.childrens" :task="task" :key="task.id" :childrens="task.childrens")
 </template>
 
@@ -15,6 +18,7 @@
   import { mapState } from 'vuex';
   import ProjectRow from 'components/ProjectRow';
   import TaskRow from 'components/TaskRow';
+  import Badge from 'components/Badge';
 
   function objectSort(field) {
     return (a, b) => {
@@ -28,18 +32,24 @@
     components: {
       ProjectRow,
       TaskRow,
+      Badge,
     },
 
     computed: {
       ...mapState({
         projects: state => state.projects.all,
         tasks: state => state.tasks.all,
-        loaderStack: state => state.loader.stack,
       }),
 
       taskTree() {
         const tree = {};
-        const tasks = [...this.tasks];
+        const tasks = [];
+        const projectUnread = {};
+
+        this.tasks.forEach(task => {
+          tasks.push({ ...task });
+        });
+
         if (tasks) {
           tasks.forEach(task => {
             const parentId = task.super_task ? task.super_task.id : 0;
@@ -47,6 +57,14 @@
               tree[parentId] = [];
             }
             tree[parentId].push(task);
+
+            if (task.comments_unread) {
+              const projectId = task.project ? task.project.id : 0;
+              if (!projectUnread[projectId]) {
+                projectUnread[projectId] = 0;
+              }
+              projectUnread[projectId] += window.parseInt(task.comments_unread);
+            }
           });
           tasks.forEach(task => {
             task.childrens = tree[task.id] || [];
@@ -60,6 +78,7 @@
             const pid = task.project ? task.project.id : 0;
             if (!projectTree[pid]) {
               projectTree[pid] = task.project || { name: '???' };
+              projectTree[pid].unread = projectUnread[pid] || 0;
               projectTree[pid].childrens = [];
             }
             projectTree[pid].childrens.push(task);
@@ -76,9 +95,9 @@
     },
 
     methods: {
-      sync() {
-        this.$store.dispatch('syncProjects');
-        this.$store.dispatch('syncTasks');
+      sync(force = false) {
+        this.$store.dispatch('syncProjects', force);
+        this.$store.dispatch('syncTasks', { force });
       },
     },
 
@@ -91,11 +110,15 @@
 
 <style lang="stylus">
   header
-    background #DDD
+    background #D2D0D2
+    box-shadow inset 0 1px 0 #FFF2, inset 0 -1px 0 #0001
     padding    10px 20px
+    .pull-right
+      float right
   aside
     width 30%
     min-width 300px
+    border-right 1px solid #EEE
   button
     padding       5px 10px
     border        1px solid #0003

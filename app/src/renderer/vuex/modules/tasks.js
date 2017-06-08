@@ -6,7 +6,11 @@ const state = {
 
 const mutations = {
   [types.ADD_TASKS](state, tasks) {
-    state.all = [...state.all, ...tasks];
+    const newTasks = [];
+    tasks.forEach(task => {
+      newTasks.push({ ...task });
+    });
+    state.all = [...state.all, ...newTasks];
   },
   [types.SET_TASKS](state, tasks) {
     state.all = [...tasks];
