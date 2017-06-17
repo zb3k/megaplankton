@@ -1,18 +1,18 @@
 <template lang="pug">
-  div.task-row-box(:class="{active:showContent}" @click.stop="showContent=!showContent")
+  div.task-row-box(:class="{active:showContent}" @click.stop="onClick")
     div.task-row()
       div.task-info
         slot(name="info")
         badge(type="danger" v-if="childUnread") {{ childUnread }}
         badge(type="warning" v-if="task.comments_unread") {{ task.comments_unread }}
       div.task-name(:style="`margin-left:${level*18+5}px`")
-        span.task-icon(@click.stop="showContent=!showContent")
+        span.task-icon(@click.stop="toggleContent")
           i.fa(:class="showContent ? 'fa-minus-square' : 'fa-plus-square'" v-if="task.childrens && task.childrens.length")
         | {{ task.name }}
       //- div.parent-task-name(v-if="task.super_task") {{ task.super_task.name }}
     slot(v-if="showContent")
       div.childrens(v-if="task.childrens")
-        task-row(v-for="task in childrens" :task="task" :key="task.id" :childrens="task.childrens" :level="level+1")
+        task-row(v-for="task in childrens" :task="task" :key="task.id" :childrens="task.childrens" :level="level+1" :click="click")
 </template>
 
 <script>
@@ -38,6 +38,7 @@
     props: {
       task: Object,
       childrens: Array,
+      click: Function,
       level: {
         default: 1,
       },
@@ -53,13 +54,26 @@
       },
     },
 
+    methods: {
+      toggleContent() {
+        this.showContent = !this.showContent;
+      },
+
+      onClick() {
+        this.toggleContent();
+        if (this.click) {
+          this.click(this.task);
+        }
+      },
+    },
+
   };
 </script>
 
 <style lang="stylus">
   .task-row-box .task-row-box .task-name
     font-size 0.9rem
-  //     padding-left 20px
+
   .task-row
     border-bottom 1px solid #EEE
     cursor        pointer

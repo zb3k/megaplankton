@@ -26,4 +26,6 @@
   html
     font-size 14px
     font-family "Open Sans"
+  h1
+    margin-bottom 30px
 </style>

@@ -1,7 +1,7 @@
 import megaplan from 'megaplanjs';
 import Vue from 'vue';
-
-const client = new megaplan.Client('agroindex.megaplan.ru')
+const HOST = 'agroindex.megaplan.ru';
+const client = new megaplan.Client(HOST)
   .auth('d.bourim@gmail.com', 'XQKn%6Gn2w//nxBCw');
 let isAuth = false;
 
@@ -64,4 +64,15 @@ export default {
   client,
   projects: (...args) => callApi('projects', args, ({ projects }) => Object.values(projects)),
   tasks: (...args) => callApi('tasks', args, (tasks) => Object.values(tasks)),
+  task: (...args) => callApi('task', args, ({ task }) => task),
+  task_comments: (...args) => callApi('task_comments', args, ({ comments }) =>
+    Object.values(comments)),
+
+  getThumb(file, width = 200, height = 152) {
+    file = file.replace('/apiattach/', '/attach/').replace(/\/[^/]+$/, '');
+    if (file.search(/\.(jpg|png|gif|jpeg)$/i) > 0) {
+      return `https://pc11.megaplan.ru/hosts/${HOST}/${width}x${height}${file}`;
+    }
+    return null;
+  },
 };
