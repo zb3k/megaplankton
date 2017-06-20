@@ -3,7 +3,7 @@
     div(v-for="file in files" :key="file.name")
       .thumb
         img(v-if="file.thumb" :src="file.thumb")
-        div.ext(v-else) {{ file.ext }}
+        div.ext(v-else :class="file.ext") {{ file.ext }}
       .filename {{ file.name }}
 </template>
 
@@ -59,16 +59,32 @@
         display         flex
         align-items     center
         justify-content center
-        background      #E2EDF0
         img
           max-width  100%
           max-height 100%
           display    block
       .ext
         text-transform uppercase
-        font-size      2rem
-        color          #8D9596
-        text-shadow    0 1px 0 #FFF3
+        letter-spacing 1px
+        font-size      1.5rem
+        color          #FFFE
+        background     #999
+        padding        3px 10px
+        border-radius  2px
+        text-shadow    0 -1px 0 #0003
+        box-shadow     inset 0 0 0 1px #0001
+        &.xlsx
+          background-color #7C7
+        &.pdf
+          background-color #C55
+        &.doc
+        &.docx
+          background-color #59C
+        &.sketch
+          background-color #FB3
+        &.zip, &.rar, &.gz, &.tar
+          background-color #3B9
+
     .filename
       font-size 0.8rem
       text-overflow ellipsis

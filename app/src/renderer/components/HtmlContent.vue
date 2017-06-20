@@ -35,7 +35,13 @@
       margin 5px 20px
       li
         margin-bottom 5px
-
+    // pre
+    //   font-family Monaco
+    //   font-size 13px
+    //   padding 20px
+    //   overflow auto
+    //   line-height 18px
+    //   background #0002
     blockquote
       background    rgba(#000, .03)
       color         #555

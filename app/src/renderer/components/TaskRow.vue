@@ -1,5 +1,5 @@
 <template lang="pug">
-  div.task-row-box(:class="{opened:showContent, active:isActive}" @click.stop="onClick")
+  div.task-row-box(:class="{opened:isOpen, active:isActive}" @click.stop="onClick")
     div.task-row()
       div.task-name(:style="`margin-left:${level*18+5}px`")
         span.task-icon(@click.stop="toggleContent")
@@ -9,7 +9,7 @@
         slot(name="info")
         badge(v-if="childUnread") {{ childUnread }}
         badge(type="info" v-if="task.comments_unread") {{ task.comments_unread }}
-    slot(v-if="showContent")
+    slot(v-if="isOpen")
       div.childrens(v-if="task.childrens")
         task-row(v-for="task in childrens" :task="task" :key="task.id" :childrens="task.childrens" :level="level+1" :click="click" :activeIds="activeIds")
 </template>
@@ -45,7 +45,7 @@
     },
 
     data: () => ({
-      showContent: false,
+      isOpen: false,
       // isActive: false,
     }),
 
@@ -60,12 +60,15 @@
 
     methods: {
       toggleContent() {
-        this.showContent = !this.showContent;
+        this.isOpen = !this.isOpen;
+      },
+      showContent() {
+        this.isOpen = true;
       },
 
       onClick() {
-        this.toggleContent();
-        // this.isActive = this.showContent;
+        this.showContent();
+        // this.isActive = this.isOpen;
         if (this.click) {
           this.click(this.task);
         }

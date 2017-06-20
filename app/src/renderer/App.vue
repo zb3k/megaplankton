@@ -39,4 +39,9 @@
     font-family "Open Sans"
   h1
     margin-bottom 30px
+  hr
+    border     none
+    height     1px
+    background #0001
+    margin     20px 0
 </style>

@@ -88,4 +88,8 @@ export default {
   getCommentLink(taskId, commentId) {
     return `https://${HOST}/task/${taskId}/card/#c${commentId}`;
   },
+
+  getTaskLink(taskId) {
+    return `https://${HOST}/task/${taskId}/card/`;
+  },
 };

@@ -4,7 +4,7 @@
       avatar(:value="value.avatar")
 
       .comment-header
-        .comment-actions
+        ui-actions
           favorite(:active="value.is_favorite")
           ext-link(:href="exteranlLink") #
         .comment-tray
@@ -24,6 +24,7 @@
   import Datetime from 'components/Datetime';
   import Favorite from 'components/Favorite';
   import ExtLink from 'components/ExtLink';
+  import UiActions from 'components/UiActions';
 
   import api from '../vuex/api';
 
@@ -38,6 +39,7 @@
       Datetime,
       Favorite,
       ExtLink,
+      UiActions,
     },
 
     props: {
@@ -67,10 +69,22 @@
       background #FFFEE9
 
     &.comment-favorite
-      // background #FFFEE9
-      .comment-actions > .favorite
+      background #F7F7F7
+      // background linear-gradient(0deg, #F7F7F7, #FFF)
+      // .comment-content
+      //   padding 20px
+      //   border-radius 4px
+      //   background #EEE
+      // border-top 2px solid #4994FF
+      // border-left 12px solid #999
+      border-right 12px solid #f90
+      // border-right 12px solid #09f
+      // border-width 0 5px
+      .actions > .favorite
         display block
-
+    .comment-content
+      >*:last-child
+        margin-bottom 0
     .comment-header
       margin-bottom 0
       padding 1px 0
@@ -88,32 +102,18 @@
       float right
       transition all .1s ease
 
-    .comment-actions
+    .actions
       position absolute
       right    -25px
       top      -2px
 
       > *
-        display        block
-        vertical-align top
-        width          22px
-        line-height    @width
-        height         @width
-        background     #FFF
-        box-shadow     0 0 0 1px #0001
-        text-align     center
-        border-radius  50%
-        margin-bottom  5px
-        transition     all .15s ease
         display        none
-        &:hover
-          box-shadow 0 0 0 1px #09F
-          cursor     pointer
 
     &:hover
-      // background #F9F9F9
       cursor default
-      .comment-actions > *
+
+      .actions > *
         display block
 
     .avatar

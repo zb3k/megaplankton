@@ -18,7 +18,7 @@
           task-row(v-for="task in project.childrens" :task="task" :key="task.id" :childrens="task.childrens" :click="selectTask" :activeIds="currentTaskIds")
       .content
         .task-container(v-if="task"): task(:value="task")
-        .comments-container(v-if="comments.length"): comment(v-for="comment in filteredComments" :value="comment" :taskId="task.id")
+        .comments-container(v-if="filteredComments.length"): comment(v-for="comment in filteredComments" :value="comment" :taskId="task.id")
 </template>
 
 <script>
@@ -70,7 +70,7 @@
       filteredComments() {
         const max = 30;
         if (this.comments.length > max) {
-          const latest = this.comments.length - 1;
+          const latest = this.comments.length;
           return this.comments.slice(latest - max, latest);
         }
         return this.comments;
@@ -110,6 +110,10 @@
                 projectUnread[projectId] = 0;
               }
               projectUnread[projectId] += window.parseInt(task.comments_unread);
+              // if (task.comments_unread) {
+              //   console.log('task.comments_unread => ', task.comments_unread,
+              //     task.project.name, task.super_task.name, task.name);
+              // }
             }
           });
           tasks.forEach(task => {
@@ -120,6 +124,10 @@
 
         const projectTree = {};
         if (tree[0]) {
+          // let projectTasks = [];
+          // projectTasks = tree[0];
+          // delete(tree[0]);
+          // projectTasks = [...projectTasks, ...Object.values(tree)];
           tree[0].forEach(task => {
             const pid = task.project ? task.project.id : 0;
             if (!projectTree[pid]) {
@@ -168,6 +176,8 @@
           id = this.$route.params.id;
         }
         if (id) {
+          this.task = {};
+          this.comments = [];
           api.task(id).then((task) => {
             this.task = task;
             api.taskComments(id).then((comments) => {
@@ -235,7 +245,7 @@
       margin-left 5px
 
   .task-container
-    background #F3FDFD
+    background #E8EFEF
     padding 30px
   .comments-container
     // padding 30px 0
