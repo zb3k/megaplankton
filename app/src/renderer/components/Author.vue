@@ -16,4 +16,5 @@
   .author
     display inline-block
     font-weight bold
+    color #09D
 </style>

@@ -23,6 +23,7 @@
 
 <style lang="stylus">
   .project-row
+    position relative
     background    #f9f9f9
     border-bottom 1px solid #EEE
     transition    all .15s ease
@@ -36,7 +37,7 @@
     //   box-shadow 0 1px 5px #0001
 
     > div
-      padding    10px 20px
+      padding    5px 10px 5px 20px
       // display    table-cell
       // text-align left
 
@@ -57,8 +58,13 @@
       // display     inline-block
       // margin-left 5px
     .project-info
-      // width 100px
+      position absolute
+      right 0
+      top 0
+      bottom 0
       text-align right
-      float right
+      padding-right 5px !important
+      // >*
+      //   vertical-align middle
 
 </style>

@@ -3,19 +3,22 @@
 
     header
       button(@click="sync(true)") Sync
+      button(v-if="unreadIds.length" @click="markCommentsAsRead") Mark as read
       .pull-right
         badge projects: {{ projects.length }}
         badge tasks: {{ tasks.length }}
+        badge comments: {{ comments.length }}
+        badge unread: {{ unreadIds.length }}
 
     .layout
       .aside
         project-row(v-for="project in filteredProjects" :project="project" :key="project.id" v-if="project.childrens.length")
-          template(slot="info"): badge(type="danger" v-if="project.unread") {{ project.unread }}
+          template(slot="info"): badge(v-if="project.unread") {{ project.unread }}
           //- / {{ project.childrens.length }}
-          task-row(v-for="task in project.childrens" :task="task" :key="task.id" :childrens="task.childrens" :click="selectTask")
+          task-row(v-for="task in project.childrens" :task="task" :key="task.id" :childrens="task.childrens" :click="selectTask" :activeIds="currentTaskIds")
       .content
-        .task-container: task(:value="task")
-        .comments-container: comment(v-for="comment in comments" :value="comment")
+        .task-container(v-if="task"): task(:value="task")
+        .comments-container(v-if="comments.length"): comment(v-for="comment in filteredComments" :value="comment" :taskId="task.id")
 </template>
 
 <script>
@@ -55,6 +58,34 @@
         projects: state => state.projects.all,
         tasks: state => state.tasks.all,
       }),
+
+      taskIdIndex() {
+        const result = {};
+        this.tasks.forEach((task, index) => {
+          result[task.id] = index;
+        });
+        return result;
+      },
+
+      filteredComments() {
+        const max = 30;
+        if (this.comments.length > max) {
+          const latest = this.comments.length - 1;
+          return this.comments.slice(latest - max, latest);
+        }
+        return this.comments;
+      },
+
+      unreadIds() {
+        if (!this.comments) {
+          return [];
+        }
+        return this.comments.filter((item) => item.is_unread).map(item => item.id);
+      },
+
+      currentTaskIds() {
+        return this.$route.params ? [this.$route.params.id] : [];
+      },
 
       taskTree() {
         const tree = {};
@@ -115,18 +146,50 @@
         this.$store.dispatch('syncTasks', { force });
       },
 
-      selectTask(task) {
-        api.task(task.id).then((task) => {
-          this.task = task;
+      markCommentsAsRead() {
+        if (this.unreadIds && this.unreadIds.length) {
+          api.markCommentsAsRead(this.unreadIds).then(() => {
+            this.loadTask();
+          });
+        }
+      },
+
+      selectTask({ id }) {
+        this.loadTask(id);
+
+        this.$router.push({
+          name: 'tasks',
+          params: { id },
         });
-        api.task_comments(task.id).then((comments) => {
-          this.comments = comments;
-        });
+      },
+
+      loadTask(id = 0) {
+        if (!id && this.$route.params) {
+          id = this.$route.params.id;
+        }
+        if (id) {
+          api.task(id).then((task) => {
+            this.task = task;
+            api.taskComments(id).then((comments) => {
+              this.comments = comments || [];
+              // this.$nextTick(() => {
+              //   console.log('this.unreadIds => ', this.unreadIds);
+              //   this.$store.dispatch('updateTask', {
+              //     id: this.task.id,
+              //     comments_unread: this.unreadIds.length,
+              //   });
+              // });
+            });
+          });
+        }
       },
     },
 
     mounted() {
       this.sync();
+      // this.$nextTick(() => {
+      //   this.loadTask();
+      // });
     },
   };
 </script>
@@ -134,7 +197,7 @@
 
 <style lang="stylus">
   header
-    background #D2D0D2
+    background #383C3E
     box-shadow inset 0 1px 0 #FFF2, inset 0 -1px 0 #0001
     padding    10px 20px
     .pull-right
@@ -152,7 +215,7 @@
       top          43px
       background   #fff
     > .content
-      //       width 70%
+      width 70%
       position fixed
       right    0
       left     30%
@@ -166,13 +229,16 @@
     border        1px solid #0003
     border        none
     background    #09d
-    border-radius 3px
+    border-radius 2px
     color         #FFF
+    + button
+      margin-left 5px
 
   .task-container
-    background #EDFAF9
-    padding 40px
+    background #F3FDFD
+    padding 30px
   .comments-container
-    padding 0 40px
+    // padding 30px 0
+    padding-bottom 60px
     border-top 1px solid #DDD
 </style>

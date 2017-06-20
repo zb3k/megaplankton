@@ -9,6 +9,17 @@
 
   export default {
     store,
+
+    // mounted() {
+    //   const taskId = window.localStorage.getItem('last-task-id');
+    //   if (taskId) {
+    //     console.log('taskId => ', taskId);
+    //     this.$router.push({
+    //       name: 'tasks',
+    //       params: { id: taskId },
+    //     });
+    //   }
+    // },
   };
 </script>
 

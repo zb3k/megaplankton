@@ -16,7 +16,7 @@
   .avatar
     width         35px
     height        @width
-    border-radius 4px
+    border-radius 50%
     overflow      hidden
     img
       max-width 100%

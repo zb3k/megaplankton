@@ -57,3 +57,8 @@ export const syncTasks = ({ commit, dispatch, state }, params = { offset: 0 }) =
     });
   }
 };
+
+export const updateTask = ({ commit, state }, task) => {
+  commit(types.UPDATE_TASK, task);
+  // storage.set('tasks', state.tasks.all);
+};

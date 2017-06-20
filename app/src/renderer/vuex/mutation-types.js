@@ -8,4 +8,5 @@ export const SET_PROJECTS = 'SET_PROJECTS';
 
 export const ADD_TASKS = 'ADD_TASKS';
 export const SET_TASKS = 'SET_TASKS';
+export const UPDATE_TASK = 'UPDATE_TASK';
 export const RESET_TASKS = 'RESET_TASKS';

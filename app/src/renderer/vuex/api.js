@@ -23,14 +23,22 @@ function callApiFromStack(decriment = false) {
   }
   if (stack.length && inProgress < MAX_STACK_SIZE) {
     inProgress++;
-    const { method, params, mutator, resolve, reject } = stack.shift();
-    // console.log('API => ', method, JSON.stringify(params));
+    const task = stack.shift();
+    const { params, mutator, resolve, reject } = task;
+    let { method } = task;
+    if (method[0] === ':') {
+      params.unshift(method);
+      method = '__request';
+    }
+    console.log('api => ', method, params);
     client[method](...params).send(
       (result) => {
+        console.log('   success', method, params);
         callApiFromStack(true);
         resolve(mutator ? mutator(result) : result);
       },
       (error) => {
+        console.log('   error', method, params);
         callApiFromStack(true);
         reject(error);
       }
@@ -42,7 +50,6 @@ function callApiFromStack(decriment = false) {
 
 function callApi(method, params, mutator) {
   // console.log('stack.length => ', stack.length);
-
   const stackItem = { method, params, mutator };
 
   const result = new Promise((resolve, reject) => {
@@ -65,8 +72,10 @@ export default {
   projects: (...args) => callApi('projects', args, ({ projects }) => Object.values(projects)),
   tasks: (...args) => callApi('tasks', args, (tasks) => Object.values(tasks)),
   task: (...args) => callApi('task', args, ({ task }) => task),
-  task_comments: (...args) => callApi('task_comments', args, ({ comments }) =>
+  taskComments: (...args) => callApi('task_comments', args, ({ comments }) =>
     Object.values(comments)),
+  markCommentsAsRead: (ids) => callApi('::comment/markAsRead.api', [{ IdList: ids }], (result) =>
+    result),
 
   getThumb(file, width = 200, height = 152) {
     file = file.replace('/apiattach/', '/attach/').replace(/\/[^/]+$/, '');
@@ -74,5 +83,9 @@ export default {
       return `https://pc11.megaplan.ru/hosts/${HOST}/${width}x${height}${file}`;
     }
     return null;
+  },
+
+  getCommentLink(taskId, commentId) {
+    return `https://${HOST}/task/${taskId}/card/#c${commentId}`;
   },
 };
