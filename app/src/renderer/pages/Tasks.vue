@@ -4,7 +4,9 @@
     header
       button(@click="sync(true)") Sync
       button(v-if="unreadIds.length" @click="markCommentsAsRead") Mark as read
+      button(@click="test") test
       .pull-right
+        badge route id: {{ $route.params.id }}
         badge projects: {{ projects.length }}
         badge tasks: {{ tasks.length }}
         badge comments: {{ comments.length }}
@@ -14,7 +16,6 @@
       .aside
         project-row(v-for="project in filteredProjects" :project="project" :key="project.id" v-if="project.childrens.length")
           template(slot="info"): badge(v-if="project.unread") {{ project.unread }}
-          //- / {{ project.childrens.length }}
           task-row(v-for="task in project.childrens" :task="task" :key="task.id" :childrens="task.childrens" :click="selectTask" :activeIds="currentTaskIds")
       .content
         .task-container(v-if="task"): task(:value="task")
@@ -192,6 +193,12 @@
             });
           });
         }
+      },
+      test() {
+        // this.$store.dispatch('updateTask', {
+        //   id: this.$route.params.id,
+        //   comments_unread: 10,
+        // });
       },
     },
 

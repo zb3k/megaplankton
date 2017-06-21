@@ -4,7 +4,8 @@
       div.task-name(:style="`margin-left:${level*18+5}px`")
         span.task-icon(@click.stop="toggleContent")
           i.fa(class="fa-angle-right" v-if="task.childrens && task.childrens.length")
-        | {{ task.name }}
+        favorite(v-if="task.favorite" :active="task.favorite")
+        |  {{ task.name }}
       div.task-info
         slot(name="info")
         badge(v-if="childUnread") {{ childUnread }}
@@ -16,6 +17,7 @@
 
 <script>
   import Badge from 'components/Badge';
+  import Favorite from 'components/Favorite';
 
   function countDeep(tasks) {
     let count = 0;
@@ -32,6 +34,7 @@
 
     components: {
       Badge,
+      Favorite,
     },
 
     props: {
@@ -53,6 +56,9 @@
       childUnread() {
         return countDeep(this.task.childrens);
       },
+      // childFavorite() {
+
+      // },
       isActive() {
         return this.activeIds ? this.activeIds.indexOf(this.task.id * 1) >= 0 : false;
       },
@@ -68,6 +74,7 @@
 
       onClick() {
         this.showContent();
+        // console.log('this.task => ', this.task);
         // this.isActive = this.isOpen;
         if (this.click) {
           this.click(this.task);

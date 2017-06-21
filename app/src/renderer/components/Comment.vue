@@ -1,11 +1,11 @@
 <template lang="pug">
-  section.comment(:class="{'comment-unread': value.is_unread, 'comment-favorite': value.is_favorite}")
+  section.comment(:class="{'comment-unread': value.is_unread, 'comment-favorite': isFavorite}")
     .comment-wrapper
       avatar(:value="value.avatar")
 
       .comment-header
         ui-actions
-          favorite(:active="value.is_favorite")
+          favorite(:active="isFavorite" :id="value.id" type="comment" @update="updateFavorite")
           ext-link(:href="exteranlLink") #
         .comment-tray
           datetime(:value="value.time_created")
@@ -47,12 +47,26 @@
       taskId: null,
     },
 
+    data: () => ({
+      localFavorite: null,
+    }),
+
     computed: {
       message() {
         return this.value.text.replace(/\n/g, '<br>');
       },
       exteranlLink() {
         return api.getCommentLink(this.taskId, this.value.id);
+      },
+
+      isFavorite() {
+        return this.localFavorite !== null ? this.localFavorite : this.value.is_favorite;
+      },
+    },
+
+    methods: {
+      updateFavorite(isFavorite) {
+        this.localFavorite = isFavorite;
       },
     },
   };
@@ -63,30 +77,22 @@
   .comment
     padding    20px 40px 20px 30px
     box-shadow inset 0 -1px 0 #0001
+    transition all .15s ease
 
     &.comment-unread
       position relative
       background #FFFEE9
 
     &.comment-favorite
-      background #F7F7F7
-      // background linear-gradient(0deg, #F7F7F7, #FFF)
-      // .comment-content
-      //   padding 20px
-      //   border-radius 4px
-      //   background #EEE
-      // border-top 2px solid #4994FF
-      // border-left 12px solid #999
-      border-right 12px solid #f90
-      // border-right 12px solid #09f
-      // border-width 0 5px
+      background #F6F2EE
+      box-shadow inset 0 -1px 0 #0001, inset 5px 0 0 #F90
       .actions > .favorite
         display block
     .comment-content
       >*:last-child
         margin-bottom 0
     .comment-header
-      margin-bottom 0
+      margin-bottom 4px
       padding 1px 0
 
     .comment-wrapper
@@ -119,5 +125,5 @@
     .avatar
       position absolute
       left     0
-      top      1px
+      top      4px
 </style>

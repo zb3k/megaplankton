@@ -2,7 +2,7 @@
   section.task(v-if="value")
     .panel
       ui-actions
-        favorite(:active="value.is_favorite")
+        favorite(:active="isFavorite" :id="value.id" type="task" @update="updateFavorite")
         ext-link(:href="taskLink") #
       h1 {{ value.name }}
       //- .panel
@@ -45,9 +45,23 @@
       value: null,
     },
 
+    data: () => ({
+      localFavorite: null,
+    }),
+
     computed: {
       taskLink() {
         return this.value.id ? api.getTaskLink(this.value.id) : '';
+      },
+      isFavorite() {
+        return this.localFavorite !== null ? this.localFavorite : this.value.favorite;
+      },
+    },
+
+    methods: {
+      updateFavorite(isFavorite) {
+        console.log('this.value => ', this.value);
+        this.localFavorite = isFavorite;
       },
     },
   };

@@ -77,6 +77,13 @@ export default {
   markCommentsAsRead: (ids) => callApi('::comment/markAsRead.api', [{ IdList: ids }], (result) =>
     result),
 
+  removeFavorite(SubjectType, SubjectId) {
+    return callApi(':common/Favorite/remove.api', [{ SubjectType, SubjectId }], (result) => result);
+  },
+  addFavorite(SubjectType, SubjectId) {
+    return callApi(':common/Favorite/add.api', [{ SubjectType, SubjectId }], (result) => result);
+  },
+
   getThumb(file, width = 200, height = 152) {
     file = file.replace('/apiattach/', '/attach/').replace(/\/[^/]+$/, '');
     if (file.search(/\.(jpg|png|gif|jpeg)$/i) > 0) {
