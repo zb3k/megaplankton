@@ -1,17 +1,12 @@
 import megaplan from 'megaplanjs';
 import Vue from 'vue';
-const HOST = 'agroindex.megaplan.ru';
-const client = new megaplan.Client(HOST)
-  .auth('d.bourim@gmail.com', 'XQKn%6Gn2w//nxBCw');
-let isAuth = false;
 
-client.on('auth', (authResult, authError) => {
-  if (authError) {
-    console.error(authError);
-  } else {
-    isAuth = true;
-  }
-});
+let AUTH_HOST;
+let AUTH_LOGIN;
+let AUTH_PASSWORD;
+
+let isAuth = false;
+let client = null;
 
 const stack = [];
 let inProgress = 0;
@@ -68,7 +63,30 @@ function callApi(method, params, mutator) {
 
 export default {
   RECORDS_LIMIT: 100,
+  AUTH_HOST,
+  AUTH_LOGIN,
+  AUTH_PASSWORD,
+  isAuth,
   client,
+
+  auth(host, login, password) {
+    AUTH_HOST = host;
+    AUTH_LOGIN = login;
+    AUTH_PASSWORD = password;
+
+    client = new megaplan.Client(AUTH_HOST).auth(AUTH_LOGIN, AUTH_PASSWORD);
+    return new Promise((resolve, reject) => {
+      client.on('auth', (authResult, authError) => {
+        if (authError) {
+          reject(authError);
+        } else {
+          isAuth = true;
+          resolve();
+        }
+      });
+    });
+  },
+
   projects: (...args) => callApi('projects', args, ({ projects }) => Object.values(projects)),
   tasks: (...args) => callApi('tasks', args, (tasks) => Object.values(tasks)),
   task: (...args) => callApi('task', args, ({ task }) => task),
@@ -87,16 +105,16 @@ export default {
   getThumb(file, width = 200, height = 152) {
     file = file.replace('/apiattach/', '/attach/').replace(/\/[^/]+$/, '');
     if (file.search(/\.(jpg|png|gif|jpeg)$/i) > 0) {
-      return `https://pc11.megaplan.ru/hosts/${HOST}/${width}x${height}${file}`;
+      return `https://pc11.megaplan.ru/hosts/${AUTH_HOST}/${width}x${height}${file}`;
     }
     return null;
   },
 
   getCommentLink(taskId, commentId) {
-    return `https://${HOST}/task/${taskId}/card/#c${commentId}`;
+    return `https://${AUTH_HOST}/task/${taskId}/card/#c${commentId}`;
   },
 
   getTaskLink(taskId) {
-    return `https://${HOST}/task/${taskId}/card/`;
+    return `https://${AUTH_HOST}/task/${taskId}/card/`;
   },
 };

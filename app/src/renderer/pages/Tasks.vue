@@ -2,6 +2,7 @@
   div
 
     header
+      button(@click="$router.push({name:'login'})") Login
       button(@click="sync(true)") Sync
       button(v-if="unreadIds.length" @click="markCommentsAsRead") Mark as read
       button(@click="test") test

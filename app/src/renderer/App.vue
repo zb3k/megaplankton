@@ -34,7 +34,7 @@
 
   html, body
     height 100%
-  html
+  html, input, textarea
     font-size 14px
     font-family "Open Sans"
   h1

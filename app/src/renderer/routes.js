@@ -6,7 +6,7 @@ const route = (name, path, component) => ({
 
 export default [
   // route('landing-page', '/', require('components/LandingPageView')),
-  route('tasks', '/:id?', require('pages/Tasks')),
-  // route('tasks', '/', require('pages/Tasks')),
-  { path: '*', redirect: { name: 'tasks' } },
+  route('tasks', '/tasks/:id?', require('pages/Tasks')),
+  route('login', '/', require('pages/Login')),
+  { path: '*', redirect: { name: 'login' } },
 ];
